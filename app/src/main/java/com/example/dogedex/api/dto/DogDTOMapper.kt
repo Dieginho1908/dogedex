@@ -1,6 +1,6 @@
 package com.example.dogedex.api.dto
 
-import com.example.dogedex.Dog
+import com.example.dogedex.model.Dog
 
 class DogDTOMapper {
     private fun fromDTOToDogDomain(dogDTO: DogDTO): Dog = Dog(
