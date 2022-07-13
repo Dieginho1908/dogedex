@@ -13,25 +13,42 @@ class DogListViewModel : ViewModel() {
     private val _dogList = MutableLiveData<List<Dog>>()
     val dogList: LiveData<List<Dog>> = _dogList
 
-    private val _status = MutableLiveData<ApiResponseStatus<List<Dog>>>()
-    val status: LiveData<ApiResponseStatus<List<Dog>>> = _status
+    private val _status = MutableLiveData<ApiResponseStatus<Any>>()
+    val status: LiveData<ApiResponseStatus<Any>> = _status
 
     private val dogRepository = DogRepository()
 
     init {
-        downloadDogs()
+        getDogCollection()
     }
 
-    private fun downloadDogs() {
+    private fun getDogCollection() {
         viewModelScope.launch {
             _status.value = ApiResponseStatus.Loading()
-            handleResponseStatus(dogRepository.downloadDogs())
+            handleResponseStatus(dogRepository.getDogCollection())
         }
     }
 
+    fun addDogToUser(dogId:Long) {
+        viewModelScope.launch {
+            _status.value = ApiResponseStatus.Loading()
+            handleAddDogToUserResponseStatus(dogRepository.addDogToUser(dogId))
+        }
+    }
+
+
+    @Suppress("UNCHECKED_CAST")
     private fun handleResponseStatus(apiResponseStatus: ApiResponseStatus<List<Dog>>) {
         if(apiResponseStatus is ApiResponseStatus.Success) {
-            _dogList.value = apiResponseStatus.data
+            _dogList.value = apiResponseStatus.data!!
+        }
+
+        _status.value = apiResponseStatus as ApiResponseStatus<Any>
+    }
+
+    private fun handleAddDogToUserResponseStatus(apiResponseStatus: ApiResponseStatus<Any>) {
+        if(apiResponseStatus is ApiResponseStatus.Success) {
+            getDogCollection()
         }
 
         _status.value = apiResponseStatus
